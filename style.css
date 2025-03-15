@@ -1,0 +1,57 @@
+
+// 🔥 Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyAD5P-NzVmxYwklc2TCkI0Iqug2RdrRjno  // 🔴 یہاں اپنی Firebase API Key لگائیں
+    authDomain: " AIzaSyAD5P-NzVmxYwklc2TCkI0Iqug2RdrRjno// 🔴 یہاں اپنی Firebase Auth Domain لگائیں
+    projectId: "  AIzaSyAD5P-NzVmxYwklc2TCkI0Iqug2RdrRjno// 🔴 یہاں اپنی Firebase Project ID لگائیں
+    storageBucket: "AIzaSyAD5P-NzVmxYwklc2TCkI0Iqug2RdrRjno // 🔴 یہاں اپنی Firebase Storage Bucket لگائیں
+    messagingSenderId: "AIzaSyAD5P-NzVmxYwklc2TCkI0Iqug2RdrRjno // 🔴 یہاں اپنی Firebase Messaging Sender ID لگائیں
+    appId: AIzaSyAD5P-NzVmxYwklc2TCkI0Iqug2RdrRjno // 🔴 یہاں اپنی Firebase App ID لگائیں
+};
+
+// 🔥 Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// 🔑 Sign In with Google
+function signIn() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider)
+        .then(result => {
+            alert("Logged in as " + result.user.displayName);
+        })
+        .catch(error => {
+            console.error(error.message);
+        });
+}
+
+// 🎯 Complete Task & Earn Coins
+function completeTask() {
+    const user = auth.currentUser;
+    if (user) {
+        db.collection("users").doc(user.uid).update({
+            coins: firebase.firestore.FieldValue.increment(5) // 🎁 ہر ٹاسک پر 5 کوائنز ملیں گے
+        });
+        alert("Task completed! You earned 5 coins.");
+    } else {
+        alert("Please log in first.");
+    }
+}
+
+// 💰 Withdrawal Function
+function withdraw() {
+    const user = auth.currentUser;
+    if (user) {
+        db.collection("users").doc(user.uid).get().then(doc => {
+            if (doc.exists && doc.data().coins >= 15000) { // ✅ 15,000 Coins Minimum
+                alert("Withdrawal request sent!");
+                db.collection("users").doc(user.uid).update({ coins: 0 });
+            } else {
+                alert("Not enough coins to withdraw!");
+            }
+        });
+    } else {
+        alert("Please log in first.");
+    }
+}
